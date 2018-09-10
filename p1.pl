@@ -1,3 +1,14 @@
+#-------------------------------------------------------------------------------
+# (CS 480-01) (FA18) MOBILE DIGITAL FORENSICS
+# 				 Project 1
+# 			   Submitted By
+# 			Ashok Kumar Shrestha
+#
+# Description:
+# ============
+# Perl script to parse out email addresses and phone numbers from the data files.
+#--------------------------------------------------------------------------------
+
 #!/usr/bin/perl
 use strict;
 use warnings;
