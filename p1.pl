@@ -3,8 +3,10 @@ use strict;
 use warnings;
 
 my $filename = '../usb256.raw';
-my $myfile;
-my $num_of_params = @ARGV;
+my $infile;
+my $file;
+my $outfile = 'result.txt';
+
 print "----------------------------------------------------------------------------\n";
 read_data();
 main();
@@ -17,37 +19,61 @@ sub display_errors{
 }
 
 sub read_data{
-	open($myfile, $filename)
-  	or die "Could not open file '$filename' $!";
+	open($infile, $filename)or die "Could not open file '$filename' $!";
+	open($file, '>', $outfile) or die "Could not open file '$outfile' $!";
 }
 
 sub close_data{
-	close($myfile)
-	or die "Could not close file.";
+	close($file) or die "Could not close file: $file.";
+	close($infile) or die "Could not close file: $infile.";
 }
 
 sub fetch_emails{
 	print "Fetching emails ...\n";
-	print "Reg expr: \n";
-
-	while(<$myfile>){
-		if(/(\w+\@\w+\.\w+)/gi){
-			print "Email: [$1]\n";
-		}
-	}
+	my $regex_pat = '(\w+\@\w+\.\w+)';
+	check_file("Email",$regex_pat);
 }
 
 sub fetch_numbers{
-	print "Fetching phonenumbers ...\n";
-	my $expr = "^[[0-9]{3}[-]?]{2}[0-9]{4}\$";
-	print "Reg expr: $expr\n";
+	print "Fetching phone numbers ...\n";
+	my $regex_pat = '([[\+]?\d{1,3}]?[\-\.\(]?\d{3}[\-\.\)]?\d{3}[\-\.]?\d{4})';
+	check_file("Phone",$regex_pat);
 }
 
 sub fetch_emails_numbers{
 	print "Fetching emails and phonenumbers ...\n";
+	my $emails = '(\w+\@\w+\.\w+)';
+	my $numbers = '([[\+]?\d{1,3}]?[\-\.\(]?\d{3}[\-\.\)]?\d{3}[\-\.]?\d{4})';
+	check_file("Email",$emails,"Phone",$numbers);
+}
+
+sub check_file{
+	my $cnt = 0;
+	my $num_of_params = @_;
+	my ($current_search, $regex_pat, $next_search, $next_pat) = @_;
+	
+	while(<$infile>){
+		if(/$regex_pat/gi){
+			print $file "$current_search: [$1]\n";
+			$cnt += 1;
+		}elsif($num_of_params>2){
+			if(/$next_pat/gi){
+				print $file "$next_search: [$1]\n";
+				$cnt += 1;
+			}
+		}
+	}
+
+	if($cnt>0){
+		print "Match found: $cnt.\n";
+		print "Output written to $outfile.\n";
+	}else{
+		print("No match found.\n");
+	}
 }
 
 sub main{
+	my $num_of_params = @ARGV;
 	if($num_of_params==0 ){
 		fetch_emails_numbers();
 	}elsif($num_of_params==1 and $ARGV[0]eq "-emails"){
