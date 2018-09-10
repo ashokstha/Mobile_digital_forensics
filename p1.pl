@@ -2,34 +2,91 @@
 use strict;
 use warnings;
 
-my $num_of_params = @ARGV;
+my $filename = '../usb256.raw';
+my $infile;
+my $file;
+my $outfile = 'result.txt';
 
-if($num_of_params>2){
+print "----------------------------------------------------------------------------\n";
+read_data();
+main();
+close_data();
+print "----------------------------------------------------------------------------\n";
+
+sub display_errors{
 	print "Error! Incorrect syntax!\n";
 	print("Use...\nperl filename.pl -(phonenumbers | emails) -[phonenumbers | emails]\n")
-}else{
-	if($num_of_params==1){
-		my $param0 = $ARGV[0];
-		my $expr;
-		if($param0 eq "-phonenumbers"){ 
-			print "Fetching phonenumbers ...\n";
-			$expr = "^[[0-9]{3}[-]?]{2}[0-9]{4}\$";
-			print "Reg expr: $expr\n"
-		}elsif($param0 eq "-emails"){
-			print "Fetching emails ...\n";
-			#$expr = "^[\w]+[\.\-]*[\w]*@[\w]+\.[\w]{1,3}\$";
-			print "Reg expr: \n"
-		}
-	}else{
-		if($num_of_params==2){
-			my $param0 = $ARGV[0];
-			my $param1 = $ARGV[1];
-			if(not (($param0 eq "-phonenumbers" and $param1 eq "-emails") or ($param1 eq "-phonenumbers" and $param0 eq "-emails"))){
-				print "Error! Incorrect syntax!\n";
-				print("Use...\nperl filename.pl -(phonenumbers | emails) -[phonenumbers | emails]\n")
+}
+
+sub read_data{
+	open($infile, $filename)or die "Could not open file '$filename' $!";
+	open($file, '>', $outfile) or die "Could not open file '$outfile' $!";
+}
+
+sub close_data{
+	close($file) or die "Could not close file: $file.";
+	close($infile) or die "Could not close file: $infile.";
+}
+
+sub fetch_emails{
+	print "Fetching emails ...\n";
+	my $regex_pat = '(\w+\@\w+\.\w+)';
+	check_file("Email",$regex_pat);
+}
+
+sub fetch_numbers{
+	print "Fetching phone numbers ...\n";
+	my $regex_pat = '([[\+]?\d{1,3}]?[\-\.\(]?\d{3}[\-\.\)]?\d{3}[\-\.]?\d{4})';
+	check_file("Phone",$regex_pat);
+}
+
+sub fetch_emails_numbers{
+	print "Fetching emails and phonenumbers ...\n";
+	my $emails = '(\w+\@\w+\.\w+)';
+	my $numbers = '([[\+]?\d{1,3}]?[\-\.\(]?\d{3}[\-\.\)]?\d{3}[\-\.]?\d{4})';
+	check_file("Email",$emails,"Phone",$numbers);
+}
+
+sub check_file{
+	my $cnt = 0;
+	my $num_of_params = @_;
+	my ($current_search, $regex_pat, $next_search, $next_pat) = @_;
+	
+	while(<$infile>){
+		if(/$regex_pat/gi){
+			print $file "$current_search: [$1]\n";
+			$cnt += 1;
+		}elsif($num_of_params>2){
+			if(/$next_pat/gi){
+				print $file "$next_search: [$1]\n";
+				$cnt += 1;
 			}
 		}
+	}
 
-		print "Fetching phonenumbers and emails ...\n";
+	if($cnt>0){
+		print "Match found: $cnt.\n";
+		print "Output written to $outfile.\n";
+	}else{
+		print("No match found.\n");
+	}
+}
+
+sub main{
+	my $num_of_params = @ARGV;
+	if($num_of_params==0 ){
+		fetch_emails_numbers();
+	}elsif($num_of_params==1 and $ARGV[0]eq "-emails"){
+		fetch_emails();
+	}elsif($num_of_params==1 and $ARGV[0] eq "-phonenumbers"){
+		fetch_numbers();
+	}elsif($num_of_params==2){
+		if(($ARGV[0] eq "-phonenumbers" and $ARGV[1] eq "-emails") or ($ARGV[1] eq "-phonenumbers" and $ARGV[0] eq "-emails")){
+			fetch_emails_numbers();
+		}else{
+			display_errors();
+		}
+	}else{
+		display_errors();
 	}
 }
