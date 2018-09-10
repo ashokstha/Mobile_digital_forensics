@@ -14,8 +14,14 @@ close_data();
 print "----------------------------------------------------------------------------\n";
 
 sub display_errors{
-	print "Error! Incorrect syntax!\n";
-	print("Use...\nperl filename.pl -(phonenumbers | emails) -[phonenumbers | emails]\n")
+	print("Error! Incorrect syntax!\n\n");
+	print("Usage:\nperl filename.pl -[phonenumbers | emails]*\n\n");
+	print("Examples:\n");
+    print("python filename.py\n");
+    print("python filename.py -emails\n");
+    print("python filename.py -phonenumbers\n");
+    print("python filename.py -emails -phonenumbers\n");
+    print("python filename.py -phonenumbers -emails\n");
 }
 
 sub read_data{
@@ -29,19 +35,19 @@ sub close_data{
 }
 
 sub fetch_emails{
-	print "Fetching emails ...\n";
+	print("Fetching emails ...\n");
 	my $regex_pat = '(\w+\@\w+\.\w+)';
 	check_file("Email",$regex_pat);
 }
 
 sub fetch_numbers{
-	print "Fetching phone numbers ...\n";
+	print("Fetching phone numbers ...\n");
 	my $regex_pat = '([[\+]?\d{1,3}]?[\-\.\(]?\d{3}[\-\.\)]?\d{3}[\-\.]?\d{4})';
 	check_file("Phone",$regex_pat);
 }
 
 sub fetch_emails_numbers{
-	print "Fetching emails and phonenumbers ...\n";
+	print("Fetching emails and phonenumbers ...\n");
 	my $emails = '(\w+\@\w+\.\w+)';
 	my $numbers = '([[\+]?\d{1,3}]?[\-\.\(]?\d{3}[\-\.\)]?\d{3}[\-\.]?\d{4})';
 	check_file("Email",$emails,"Phone",$numbers);
@@ -65,8 +71,8 @@ sub check_file{
 	}
 
 	if($cnt>0){
-		print "Match found: $cnt.\n";
-		print "Output written to $outfile.\n";
+		print("Match found: $cnt.\n");
+		print("Output written to $outfile.\n");
 	}else{
 		print("No match found.\n");
 	}
