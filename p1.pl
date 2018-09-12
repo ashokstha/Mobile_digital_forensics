@@ -13,6 +13,7 @@
 use strict;
 use warnings;
 
+#path to input file (raw or dd)
 my $infile = '../usb256.raw';
 
 main();
@@ -21,16 +22,16 @@ sub display_errors{
 	print("Error! Incorrect syntax!\n\n");
 	print("Usage:\nperl filename.pl -[phonenumbers | emails]*\n\n");
 	print("Examples:\n");
-    print("python filename.py\n");
-    print("python filename.py -emails\n");
-    print("python filename.py -phonenumbers\n");
-    print("python filename.py -emails -phonenumbers\n");
-    print("python filename.py -phonenumbers -emails\n");
+    print("python filename.pl\n");
+    print("python filename.pl -emails\n");
+    print("python filename.pl -phonenumbers\n");
+    print("python filename.pl -emails -phonenumbers\n");
+    print("python filename.pl -phonenumbers -emails\n");
 }
 
 sub fetch_emails{
-	print("Fetching emails ...\n");
-	my $regex_pat = '(\w+\@\w+\.\w+)';
+	print("\nFetching emails ...\n");
+	my $regex_pat = '(\w+(\.\w+)*@\w+(\.\w+)*\.[a-zA-Z]{2,3})';
 	check_file($regex_pat,"emails.txt");
 }
 
@@ -42,7 +43,7 @@ sub fetch_numbers{
 }
 
 sub fetch_emails_numbers{
-	print("\nFetching emails and phonenumbers ...\n");
+	print("Fetching emails and phonenumbers ...\n");
 	fetch_emails();
 	fetch_numbers();
 }
