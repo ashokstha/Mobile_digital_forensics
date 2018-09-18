@@ -51,7 +51,7 @@ sub fetch_emails_numbers{
 sub check_file{
 	my ($regex_pat,$outfile)= @_;
 	open(my $file, '>', $outfile) or die "Could not open file '$outfile' $!";
-	open(my $infiles, $infile) or die "Could not open file '$outfile' $!";
+	open(my $infiles, $infile) or die "Could not open file '$infile' $!";
 
 	my $cnt = 0;
 	
@@ -64,6 +64,8 @@ sub check_file{
 
 	if($cnt>0){
 		print("Match found: $cnt.\n");
+		print("Unique Match: ");
+		system("Cat $outfile | sort | uniq | wc -l");
 		print("Output written to $outfile.\n");
 	}else{
 		print("No match found.\n");
