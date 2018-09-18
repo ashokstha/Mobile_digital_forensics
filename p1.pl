@@ -1,78 +1,81 @@
+#-------------------------------------------------------------------------------
+# (CS 480-01) (FA18) MOBILE DIGITAL FORENSICS
+#                Project 1
+#               Submitted By
+#           Ashok Kumar Shrestha
+#
+# Description:
+# ============
+# Perl script to parse out email addresses and phone numbers from the data files.
+#--------------------------------------------------------------------------------
+
 #!/usr/bin/perl
 use strict;
 use warnings;
 
-my $filename = '../usb256.raw';
-my $infile;
-my $file;
-my $outfile = 'result.txt';
+#path to input file (raw or dd)
+my $infile = '../usb256.raw';
 
-print "----------------------------------------------------------------------------\n";
-read_data();
 main();
-close_data();
-print "----------------------------------------------------------------------------\n";
 
 sub display_errors{
-	print "Error! Incorrect syntax!\n";
-	print("Use...\nperl filename.pl -(phonenumbers | emails) -[phonenumbers | emails]\n")
-}
-
-sub read_data{
-	open($infile, $filename)or die "Could not open file '$filename' $!";
-	open($file, '>', $outfile) or die "Could not open file '$outfile' $!";
-}
-
-sub close_data{
-	close($file) or die "Could not close file: $file.";
-	close($infile) or die "Could not close file: $infile.";
+	print("Error! Incorrect syntax!\n\n");
+	print("Usage:\nperl filename.pl -[phonenumbers | emails]*\n\n");
+	print("Examples:\n");
+    print("python filename.pl\n");
+    print("python filename.pl -emails\n");
+    print("python filename.pl -phonenumbers\n");
+    print("python filename.pl -emails -phonenumbers\n");
+    print("python filename.pl -phonenumbers -emails\n");
 }
 
 sub fetch_emails{
-	print "Fetching emails ...\n";
-	my $regex_pat = '(\w+\@\w+\.\w+)';
-	check_file("Email",$regex_pat);
+	print("\nFetching emails ...\n");
+	my $regex_pat = '(\w+(\.\w+)*@\w+(\.\w+)*\.[a-zA-Z]{2,3})';
+	check_file($regex_pat,"emails.txt");
 }
 
 sub fetch_numbers{
-	print "Fetching phone numbers ...\n";
-	my $regex_pat = '([[\+]?\d{1,3}]?[\-\.\(]?\d{3}[\-\.\)]?\d{3}[\-\.]?\d{4})';
-	check_file("Phone",$regex_pat);
+	print("\nFetching phone numbers ...\n");
+	my $regex_pat = '([\(]?\d{3}[\)]?[\-\.\ ]\d{3}[\-\.\ ]\d{4})\b';
+	
+	check_file($regex_pat,"phones.txt");
 }
 
 sub fetch_emails_numbers{
-	print "Fetching emails and phonenumbers ...\n";
-	my $emails = '(\w+\@\w+\.\w+)';
-	my $numbers = '([[\+]?\d{1,3}]?[\-\.\(]?\d{3}[\-\.\)]?\d{3}[\-\.]?\d{4})';
-	check_file("Email",$emails,"Phone",$numbers);
+	print("Fetching emails and phonenumbers ...\n");
+	fetch_emails();
+	fetch_numbers();
 }
 
 sub check_file{
+	my ($regex_pat,$outfile)= @_;
+	open(my $file, '>', $outfile) or die "Could not open file '$outfile' $!";
+	open(my $infiles, $infile) or die "Could not open file '$outfile' $!";
+
 	my $cnt = 0;
-	my $num_of_params = @_;
-	my ($current_search, $regex_pat, $next_search, $next_pat) = @_;
 	
-	while(<$infile>){
+	while(<$infiles>){
 		if(/$regex_pat/gi){
-			print $file "$current_search: [$1]\n";
+			print $file "[$1]\n";
 			$cnt += 1;
-		}elsif($num_of_params>2){
-			if(/$next_pat/gi){
-				print $file "$next_search: [$1]\n";
-				$cnt += 1;
-			}
 		}
 	}
 
 	if($cnt>0){
-		print "Match found: $cnt.\n";
-		print "Output written to $outfile.\n";
+		print("Match found: $cnt.\n");
+		print("Output written to $outfile.\n");
 	}else{
 		print("No match found.\n");
 	}
+
+	close($infiles) or die "Could not close file: $infile.";
+	close($file) or die "Could not close file: $outfile.";
 }
 
 sub main{
+	print "----------------------------------------------------------------------------\n";
+	
 	my $num_of_params = @ARGV;
 	if($num_of_params==0 ){
 		fetch_emails_numbers();
@@ -89,4 +92,6 @@ sub main{
 	}else{
 		display_errors();
 	}
+
+	print "----------------------------------------------------------------------------\n";
 }
