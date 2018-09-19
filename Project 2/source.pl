@@ -25,12 +25,12 @@ sub main{
 	
 	print("Start processing...\n");
 
-	open(my $infiles, "<:encoding(unicode)", $infile) or die "Could not open file '$infile' $!";
+	open(my $infiles, "<:encoding(latin1)", $infile) or die "Could not open file '$infile' $!";
 	open(my $file, '>', $outfile) or die "Could not open file '$outfile' $!";
 
 	my $cnt = 0;
 	
-	my $regex_start = '(J.?O.?S.?H.?(\s|.)*)';
+	my $regex_start = '(.?J.?O.?S.?H.?(\s|.)*)';
 	my $regex_end = '((\s|.)*J.?O.?N.?E.?S.?)';
 	my $is_detect = 0;
 
@@ -45,6 +45,10 @@ sub main{
 				print($file "$1");
 				$cnt += 1;
 				$is_detect = 0;
+
+				system("MD5 $outfile");
+				#open($file, '>', $outfile) or die "Could not open file '$outfile' $!";
+
 			}else{
 				print($file "$_");
 			}
