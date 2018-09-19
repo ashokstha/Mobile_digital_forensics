@@ -22,9 +22,9 @@ my $result = 'result.txt';
 main();
 
 sub main{
-	print "----------------------------------------------------------------------------\n";
+	#print "----------------------------------------------------------------------------\n";
 	
-	print("Start processing...\n");
+	print("\nStart processing...\n\n");
 
 	open(my $infiles, "<:encoding(latin1)", $infile) or die "Could not open file '$infile' $!";
 	open(my $file, '>', $outfile) or die "Could not open file '$outfile' $!";
@@ -65,12 +65,10 @@ sub main{
 				chomp($md);
 				chomp($size);
 
-				#print("File $cnt: $md | $size\n");
 				$display = sprintf("\n| %4d. |  %20s  |  %8d  |",$cnt, $md, $size);
 				print($result_file $display);
 				print($display);
-				#print($result_file "\n| $cnt. |  $md   |  $size  |");
-
+				
 				open($file, '>', $outfile) or die "Could not open file '$outfile' $!";
 
 			}else{
@@ -87,7 +85,7 @@ sub main{
 	close($file) or die "Could not close file: $outfile.";
 	close($infiles) or die "Could not close file: $infile.";
 
-	print("No. of matches: $cnt\n");
+	print("\nNo. of matches: $cnt\n\n");
 
-	print "----------------------------------------------------------------------------\n";
+	#print "----------------------------------------------------------------------------\n";
 }
