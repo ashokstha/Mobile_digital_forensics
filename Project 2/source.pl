@@ -22,13 +22,13 @@ my $result = 'result.txt';
 main();
 
 sub main{
-	#print "----------------------------------------------------------------------------\n";
-	
 	print("\nStart processing...\n\n");
 
 	open(my $infiles, "<:encoding(latin1)", $infile) or die "Could not open file '$infile' $!";
 	open(my $file, '>', $outfile) or die "Could not open file '$outfile' $!";
 	open(my $result_file, '>', $result) or die "Could not open file '$result' $!";
+
+	my $dir = `mkdir jji 2>/dev/null`;
 
 	my $display = "+-------+------------------------------------+------------+\n";
 	print($result_file $display);
@@ -38,7 +38,7 @@ sub main{
 	print($result_file $display);
 	print($display);
 
-	$display = "+-------+------------------------------------+------------+";
+	$display = "+-------+------------------------------------+------------+\n";
 	print($result_file $display);
 	print($display);
 
@@ -60,12 +60,19 @@ sub main{
 				$cnt += 1;
 				$is_detect = 0;
 
+				# save the file
+				my $save = `dd if=$outfile of=jji/file_$cnt.jji 2>/dev/null`;
+
 				my $md = `MD5 $outfile | cut -d " " -f4`;
 				my $size = `ls -l $outfile | cut -d " " -f8`;
 				chomp($md);
 				chomp($size);
 
-				$display = sprintf("\n| %4d. |  %20s  |  %8d  |",$cnt, $md, $size);
+				$display = sprintf("| %4d. |  %20s  |  %8d  |",$cnt, $md, $size);
+				print($result_file $display);
+				print($display);
+
+				$display = "\n+-------+------------------------------------+------------+\n";
 				print($result_file $display);
 				print($display);
 				
@@ -76,16 +83,9 @@ sub main{
 			}
 		}
 	}
-	
-
-	$display = "\n+-------+------------------------------------+------------+\n";
-	print($result_file $display);
-	print($display);
 
 	close($file) or die "Could not close file: $outfile.";
 	close($infiles) or die "Could not close file: $infile.";
 
 	print("\nNo. of matches: $cnt\n\n");
-
-	#print "----------------------------------------------------------------------------\n";
 }
