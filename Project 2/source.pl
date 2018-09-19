@@ -17,6 +17,7 @@ use warnings;
 #my $infile = '../../jji_project.dd';
 my $infile = '../../sheep.dd';
 my $outfile = 'result.jji';
+my $result = 'result.txt';
 
 main();
 
@@ -27,6 +28,19 @@ sub main{
 
 	open(my $infiles, "<:encoding(latin1)", $infile) or die "Could not open file '$infile' $!";
 	open(my $file, '>', $outfile) or die "Could not open file '$outfile' $!";
+	open(my $result_file, '>', $result) or die "Could not open file '$result' $!";
+
+	my $display = "+-------+------------------------------------+------------+\n";
+	print($result_file $display);
+	print($display);
+
+	$display = "|  S.N. |                Hash                |    Size    |\n";
+	print($result_file $display);
+	print($display);
+
+	$display = "+-------+------------------------------------+------------+";
+	print($result_file $display);
+	print($display);
 
 	my $cnt = 0;
 	
@@ -46,8 +60,18 @@ sub main{
 				$cnt += 1;
 				$is_detect = 0;
 
-				system("MD5 $outfile");
-				#open($file, '>', $outfile) or die "Could not open file '$outfile' $!";
+				my $md = `MD5 $outfile | cut -d " " -f4`;
+				my $size = `ls -l $outfile | cut -d " " -f8`;
+				chomp($md);
+				chomp($size);
+
+				#print("File $cnt: $md | $size\n");
+				$display = sprintf("\n| %4d. |  %20s  |  %8d  |",$cnt, $md, $size);
+				print($result_file $display);
+				print($display);
+				#print($result_file "\n| $cnt. |  $md   |  $size  |");
+
+				open($file, '>', $outfile) or die "Could not open file '$outfile' $!";
 
 			}else{
 				print($file "$_");
@@ -55,6 +79,11 @@ sub main{
 		}
 	}
 	
+
+	$display = "\n+-------+------------------------------------+------------+\n";
+	print($result_file $display);
+	print($display);
+
 	close($file) or die "Could not close file: $outfile.";
 	close($infiles) or die "Could not close file: $infile.";
 
