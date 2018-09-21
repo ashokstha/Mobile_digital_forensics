@@ -5,8 +5,8 @@ from os import listdir
 from os.path import isfile, join
 import hashlib
 
-inFile = "../../sheep.jji"
-# inFile = "../../jji_project.001"
+#inFile = "../../sheep.jji"
+inFile = "../../jji_project.001"
 
 magic_numbers = {'jji_start': b'\x00\x4a\x00\x4f\x00\x53\x00\x48',
                  'jji_end': b'\x00\x4a\x00\x4f\x00\x4e\x00\x45\x00\x53'}
