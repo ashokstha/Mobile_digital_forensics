@@ -8,6 +8,10 @@
 * Description:
 * ============
 * Python script to parse out .JJI (Josh Jones Image) Files from the data files.
+*
+* Usage: python source.py -f file_path
+*
+* example: python source.py -f jji_project.001
 *--------------------------------------------------------------------------------*/
 """
 
@@ -31,7 +35,7 @@ magic_numbers = {'jji_start': b'\x00\x4a\x00\x4f\x00\x53\x00\x48',
                  'jji_end': b'\x00\x4a\x00\x4f\x00\x4e\x00\x45\x00\x53'}
 max_read_size = 10
 BUF_SIZE = 10
-byte_size = 128
+byte_size = 1024
 
 def create_dir(path):
     #remove output directory
@@ -94,7 +98,7 @@ def main():
                 # print("End_addr: {0}".format(end_addr))
 
                 size = end_addr - start_addr + BUF_SIZE
-                result_path = outpath + "/file_" + str(cnt) + ".txt"
+                result_path = outpath + "/file_" + str(cnt) + ".jji"
 
                 with open(result_path, "a+b") as r:
                     f.seek(-size, 1)
