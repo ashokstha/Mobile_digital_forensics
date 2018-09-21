@@ -1,25 +1,47 @@
+"""
+/*-------------------------------------------------------------------------------
+* (CS 480-01) (FA18) MOBILE DIGITAL FORENSICS
+*                Project 2
+*               Submitted By
+*           Ashok Kumar Shrestha
+*
+* Description:
+* ============
+* Python script to parse out .JJI (Josh Jones Image) Files from the data files.
+*--------------------------------------------------------------------------------*/
+"""
+
+
 #!/bin/python3
 import os
 import shutil
 from os import listdir
 from os.path import isfile, join
 import hashlib
+from argparse import ArgumentParser
+import sys
 
-#inFile = "../../sheep.jji"
-inFile = "../../jji_project.001"
+inFile = "../../sheep.jji"
+#inFile = "../../jji_project.001"
+
+outpath = "output_files"
+outfile = "result.txt"
 
 magic_numbers = {'jji_start': b'\x00\x4a\x00\x4f\x00\x53\x00\x48',
                  'jji_end': b'\x00\x4a\x00\x4f\x00\x4e\x00\x45\x00\x53'}
 max_read_size = 10
-
-outpath = "output_files"
-outfile = "result.txt"
-ofile = open(outfile,"w")
+BUF_SIZE = 10
+byte_size = 128
 
 def create_dir(path):
+    #remove output directory
     if os.path.exists(path):
         shutil.rmtree(path)
     os.makedirs(path)
+
+    #remove output hash file
+    if os.path.exists(outfile):
+        os.remove(outfile)
 
 
 def md5(fname):
@@ -32,25 +54,35 @@ def md5(fname):
 
 def save_file(display):
     print(display)
-    ofile.write(display+"\n")
+    with open(outfile,"a") as ofile:
+        ofile.write(display+"\n")
 
+def check_args():
+    parser = ArgumentParser()
+    parser.add_argument("-f", "--file", dest="filename",
+                        help="Path for image file", metavar="FILE_PATH")
+
+    args = parser.parse_args()
+    inFile =  args.filename
+    if not os.path.exists(inFile):
+        print("\nCould not open file. File missing or not found.\n")
+        sys.exit()
+    
+    return inFile
 
 def main():
+
+    inFile = check_args()
+
     print("\nStart")
     print("Extracting files ...\n")
+    create_dir(outpath)
 
     save_file("+-------+------------------------------------+------------+")
     save_file("|  S.N. |                Hash                |    Size    |")
     save_file("+-------+------------------------------------+------------+")
 
-    BUF_SIZE = 10
-    start_addr = 0
-    end_addr = 0
     cnt = 1
-    byte_size = 100
-
-    create_dir(outpath)
-
     with open(inFile, "rb") as f:
         buf = f.read(BUF_SIZE)
         while buf:
@@ -84,7 +116,8 @@ def main():
                 
                 cnt += 1
             else:
-                f.seek(-max_read_size + 1, 1)
+                if cnt<541:
+                    f.seek(-max_read_size + 1, 1)
 
             buf = f.read(BUF_SIZE)
 
